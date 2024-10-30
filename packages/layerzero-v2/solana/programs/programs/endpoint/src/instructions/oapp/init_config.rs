@@ -19,6 +19,8 @@ pub struct InitConfig<'info> {
         constraint = !message_lib_info.to_account_info().is_writable @LayerZeroError::ReadOnlyAccount
     )]
     pub message_lib_info: Account<'info, MessageLibInfo>,
+    /// CHECK: already checked with the message_lib account
+    pub message_lib_program: UncheckedAccount<'info>,
     /// the pda of the message_lib_program
     #[account(
         seeds = [MESSAGE_LIB_SEED],
@@ -26,8 +28,6 @@ pub struct InitConfig<'info> {
         seeds::program = message_lib_program
     )]
     pub message_lib: AccountInfo<'info>,
-    /// CHECK: already checked with the message_lib account
-    pub message_lib_program: UncheckedAccount<'info>,
 }
 
 impl InitConfig<'_> {
