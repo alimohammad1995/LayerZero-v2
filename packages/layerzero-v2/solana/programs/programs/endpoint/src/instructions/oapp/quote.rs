@@ -19,17 +19,7 @@ pub struct Quote<'info> {
     )]
     pub default_send_library_config: Account<'info, SendLibraryConfig>,
     /// The PDA signer to the send library when the endpoint calls the send library.
-    #[account(
-        seeds = [
-            MESSAGE_LIB_SEED,
-            &get_send_library(
-                &send_library_config,
-                &default_send_library_config
-            ).key().to_bytes()
-        ],
-        bump = send_library_info.bump,
-        constraint = !send_library_info.to_account_info().is_writable @LayerZeroError::ReadOnlyAccount
-    )]
+    #[account(constraint = !send_library_info.to_account_info().is_writable @LayerZeroError::ReadOnlyAccount)]
     pub send_library_info: Account<'info, MessageLibInfo>,
     #[account(seeds = [ENDPOINT_SEED], bump = endpoint.bump)]
     pub endpoint: Account<'info, EndpointSettings>,
@@ -71,6 +61,13 @@ impl Quote<'_> {
             ),
             message: params.message.clone(),
         };
+
+        assert_send_library_info(
+            &ctx.program_id,
+            &ctx.accounts.send_library_info,
+            &ctx.accounts.send_library_config,
+            &ctx.accounts.default_send_library_config
+        )?;
 
         let send_library = assert_send_library(
             &ctx.accounts.send_library_info,

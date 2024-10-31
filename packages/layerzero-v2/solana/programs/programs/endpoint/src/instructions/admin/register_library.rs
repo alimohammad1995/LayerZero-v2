@@ -14,10 +14,7 @@ pub struct RegisterLibrary<'info> {
         space = 8 + MessageLibInfo::INIT_SPACE,
         seeds = [
             MESSAGE_LIB_SEED,
-            &Pubkey::find_program_address(
-                &[MESSAGE_LIB_SEED],
-                &params.lib_program,
-            ).0.to_bytes()
+            &params.lib_account.to_bytes()
         ],
         bump
     )]
@@ -48,5 +45,6 @@ impl RegisterLibrary<'_> {
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct RegisterLibraryParams {
     pub lib_program: Pubkey,
+    pub lib_account: Pubkey,
     pub lib_type: MessageLibType,
 }

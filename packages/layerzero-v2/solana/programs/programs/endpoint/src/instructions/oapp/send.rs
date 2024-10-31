@@ -22,16 +22,7 @@ pub struct Send<'info> {
     )]
     pub default_send_library_config: Account<'info, SendLibraryConfig>,
     /// The PDA signer to the send library when the endpoint calls the send library.
-    #[account(
-        seeds = [
-            MESSAGE_LIB_SEED,
-            &get_send_library(
-                &send_library_config,
-                &default_send_library_config
-            ).key().to_bytes()
-        ],
-        bump = send_library_info.bump,
-        constraint = !send_library_info.to_account_info().is_writable @LayerZeroError::ReadOnlyAccount
+    #[account(constraint = !send_library_info.to_account_info().is_writable @LayerZeroError::ReadOnlyAccount
     )]
     pub send_library_info: Account<'info, MessageLibInfo>,
     #[account(seeds = [ENDPOINT_SEED], bump = endpoint.bump)]
@@ -75,6 +66,13 @@ impl Send<'_> {
             guid,
             message: params.message.clone(),
         };
+
+        assert_send_library_info(
+            &ctx.program_id,
+            &ctx.accounts.send_library_info,
+            &ctx.accounts.send_library_config,
+            &ctx.accounts.default_send_library_config
+        )?;
 
         let send_library = assert_send_library(
             &ctx.accounts.send_library_info,
@@ -127,6 +125,30 @@ impl Send<'_> {
 
         Ok(MessagingReceipt { guid, nonce: ctx.accounts.nonce.outbound_nonce, fee })
     }
+}
+
+pub(crate) fn assert_send_library_info(
+    program_id: &Pubkey,
+    send_library_info: &Account<MessageLibInfo>,
+    send_library_config: &SendLibraryConfig,
+    default_send_library_config: &SendLibraryConfig,
+) -> Result<()> {
+    let send_library = get_send_library(send_library_config, default_send_library_config);
+
+    let (expected_send_library_info_key, expected_bump) = Pubkey::find_program_address(
+        &[
+            MESSAGE_LIB_SEED,
+            send_library.key().as_ref()
+        ],
+        program_id,
+    );
+    require_keys_eq!(
+            send_library_info.key(),
+            expected_send_library_info_key,
+            LayerZeroError::InvalidSendLibrary
+        );
+    require!(send_library_info.bump == expected_bump,LayerZeroError::InvalidSendLibrary);
+    Ok(())
 }
 
 pub(crate) fn assert_send_library(
