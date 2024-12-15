@@ -47,7 +47,7 @@ pub fn send(
     endpoint_program: Pubkey,
     sender: Pubkey,
     accounts: &[AccountInfo],
-    seeds: &[&[u8]],
+    signers_seeds: &[&[&[u8]]],
     params: SendParams,
 ) -> Result<MessagingReceipt> {
     if sender != accounts[1].key() {
@@ -57,7 +57,7 @@ pub fn send(
         return Err(ErrorCode::ConstraintAddress.into());
     }
     let cpi_ctx = Send::construct_context(endpoint_program, accounts)?;
-    let rtn = endpoint::cpi::send(cpi_ctx.with_signer(&[&seeds]), params)?;
+    let rtn = endpoint::cpi::send(cpi_ctx.with_signer(signers_seeds), params)?;
     Ok(rtn.get())
 }
 
