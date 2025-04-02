@@ -10,13 +10,9 @@ use instructions::*;
 pub use messagelib_interface::{
     self, InitConfigParams, MessageLibType, MessagingFee, MessagingReceipt, Packet, SetConfigParams,
 };
-use solana_helper::program_id_from_env;
 use state::*;
 
-declare_id!(Pubkey::new_from_array(program_id_from_env!(
-    "ENDPOINT_ID",
-    "76y77prsiCMvXMjuoZ5VRrhG5qYBrUMYTE5WgHqgjEn6"
-)));
+declare_id!("76y77prsiCMvXMjuoZ5VRrhG5qYBrUMYTE5WgHqgjEn6");
 
 pub const ENDPOINT_SEED: &[u8] = b"Endpoint";
 pub const MESSAGE_LIB_SEED: &[u8] = b"MessageLib";
