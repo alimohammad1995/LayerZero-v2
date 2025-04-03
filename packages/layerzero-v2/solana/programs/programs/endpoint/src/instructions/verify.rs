@@ -1,6 +1,6 @@
 use crate::*;
 use cpi_helper::CpiContext;
-use solana_program::clock::Slot;
+use anchor_lang::solana_program::clock::Slot;
 
 /// MESSAGING STEP 2
 /// requires init_verify()

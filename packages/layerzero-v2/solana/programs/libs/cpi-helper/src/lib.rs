@@ -45,8 +45,8 @@ pub fn derive_cpi_context(input: TokenStream) -> TokenStream {
             const MIN_ACCOUNTS_LEN: usize = #min_accounts_len;
 
             fn construct_context(
-                program_id: solana_program::pubkey::Pubkey,
-                accounts: &[solana_program::account_info::AccountInfo<'info>],
+                program_id: anchor_lang::solana_program::pubkey::Pubkey,
+                accounts: &[anchor_lang::solana_program::account_info::AccountInfo<'info>],
             ) -> anchor_lang::Result<anchor_lang::context::CpiContext<'a, 'b, 'c, 'info, crate::cpi::accounts::#name<'info>>> {
                 if (program_id != accounts[0].key()) {
                     return Err(anchor_lang::error::ErrorCode::InvalidProgramId.into());
